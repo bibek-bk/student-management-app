@@ -54,7 +54,7 @@ const Dashboard = () => {
           <h3 className="text-lg font-semibold mb-2">Total Courses</h3>
           <p className="text-3xl font-bold">{stats.totalCourses}</p>
         </div>
-        <div className="bg-yellow-100 p-4 rounded-lg">
+        <div className="bg-red-100 p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">Total Visitors</h3>
           <p className="text-3xl font-bold">{stats.totalVisitors}</p>
         </div>
