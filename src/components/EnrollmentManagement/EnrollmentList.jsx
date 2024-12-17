@@ -14,16 +14,18 @@ const EnrollmentList = () => {
 
     useEffect(() => {
         setLoading(true);
-        
+
         // Fetch enrollments, visitors, and courses in parallel
         Promise.all([fetchEnrollments(), fetchVisitors(), fetchCourses()]) // Updated fetchStudents to fetchVisitors
             .then(([enrollmentsData, visitorsData, coursesData]) => {
                 // Map visitor and course data by their IDs
+                console.log(enrollmentsData);
+
                 const visitorMap = {}; // Updated from studentMap
                 visitorsData.forEach(visitor => {
                     visitorMap[visitor.id] = visitor.name;
                 });
-                
+
                 const courseMap = {};
                 coursesData.forEach(course => {
                     courseMap[course.id] = course.name;
@@ -31,7 +33,9 @@ const EnrollmentList = () => {
 
                 setVisitors(visitorMap); // Updated setStudents to setVisitors
                 setCourses(courseMap);
-                setEnrollments(enrollmentsData);
+                if (enrollmentsData) {
+                    setEnrollments(enrollmentsData);
+                }
             })
             .catch(setError)
             .finally(() => setLoading(false));
@@ -98,7 +102,7 @@ const EnrollmentList = () => {
                     ))}
                 </tbody>
             </table>
-            <EnrollmentForm/>
+            <EnrollmentForm />
         </div>
     );
 };

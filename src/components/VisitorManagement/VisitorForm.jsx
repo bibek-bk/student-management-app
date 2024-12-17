@@ -13,12 +13,8 @@ const VisitorForm = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    addVisitor(formData)
-      .then(() => {
-        navigate('/');
-      })
-      .catch(setError);
+    // e.preventDefault();
+    addVisitor(formData).catch(setError);
   };
 
   return (

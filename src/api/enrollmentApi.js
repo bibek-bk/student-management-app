@@ -3,7 +3,7 @@ const API_URL = 'http://localhost:3000/api';
 export const fetchEnrollments = async () => {
   const response = await fetch(`${API_URL}/enrollments`);
   if (!response.ok) {
-    throw new Error('Failed to fetch enrollments');
+    return []
   }
   return response.json();
 };
