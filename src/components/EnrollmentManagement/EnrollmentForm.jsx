@@ -44,7 +44,7 @@ const EnrollmentForm = () => {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         console.log('Form Data Being Sent:', formData); // Debugging log
     
         // Filter visitor details based on visitor_id
