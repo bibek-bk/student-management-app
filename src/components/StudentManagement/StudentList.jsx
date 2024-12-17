@@ -1,112 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { fetchStudents, deleteStudent, updatePaymentStatus } from '../../api/studentApi';
+import { useNavigate } from 'react-router-dom';
 
 const StudentList = () => {
     const [students, setStudents] = useState([]);
-    const [filteredStudents, setFilteredStudents] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         setLoading(true);
         fetchStudents()
-            .then(data => {
-                setStudents(data);
-                setFilteredStudents(data);
-            })
+            .then(setStudents)
             .catch(setError)
             .finally(() => setLoading(false));
     }, []);
 
-    // console.log(students);
-    
-    useEffect(() => {
-        const results = students.filter(student =>
-            student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            student.email.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredStudents(results);
-    }, [searchTerm, students]);
-
     const handleDelete = (id) => {
         deleteStudent(id)
-            .then(() => {
-                setStudents(prevStudents => prevStudents.filter(student => student.id !== id));
-            })
+            .then(() => setStudents(students.filter(student => student.id !== id)))
             .catch(setError);
-
-            
     };
 
-    const handleUpdatePayment = (id, status) => {
-        updatePaymentStatus(id, { paymentStatus: status })
+    const handleUpdatePayment = (id) => {
+        updatePaymentStatus(id, { paymentStatus: 'Paid' })
             .then(() => {
-                setStudents(prevStudents => prevStudents.map(student => (
-                    student.id === id ? { ...student, paymentStatus: status } : student
+                setStudents(students.map(student => (
+                    student.id === id ? { ...student, paymentStatus: 'Paid' } : student
                 )));
             })
             .catch(setError);
     };
 
-    if (loading) return <p className="text-center">Loading students...</p>;
-    if (error) return <p className="text-center text-red-500">Error loading students: {error.message}</p>;
-
     return (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-            <div className="flex justify-between items-center p-4 bg-gray-100">
-                <h2 className="text-2xl font-bold">Student List</h2>
-                <Link to="/add-student" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Add New Student
-                </Link>
-            </div>
-            <div className="p-4">
-                <input
-                    type="text"
-                    placeholder="Search students..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                />
-            </div>
-            <table className="w-full">
-                <thead className="bg-gray-200">
+        <div>
+            <h2>Student List</h2>
+            {loading && <p>Loading...</p>}
+            {error && <p style={{ color: 'red' }}>Error: {error.message}</p>}
+            <table>
+                <thead>
                     <tr>
-                        <th className="p-2 text-left">ID</th>
-                        <th className="p-2 text-left">Name</th>
-                        <th className="p-2 text-left">Email</th>
-                        <th className="p-2 text-left">Phone</th>
-                        <th className="p-2 text-left">Payment Status</th>
-                        <th className="p-2 text-left">Actions</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Courses</th>
+                        <th>Score Card</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredStudents.map(student => (
-                        <tr key={student.id} className="border-t">
-                            <td className="p-2">{student.id}</td>
-                            <td className="p-2">
-                                <Link to={`/students/${student.id}`} className="text-blue-500 hover:underline">
-                                    {student.name}
-                                </Link>
-                            </td>
-                            <td className="p-2">{student.email}</td>
-                            <td className="p-2">{student.phone}</td>
-                            <td className="p-2">{student.payment_status}</td>
-                            <td className="p-2">
-                                <button
-                                    onClick={() => handleDelete(student.id)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 mr-2"
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    onClick={() => handleUpdatePayment(student.id, 'paid')}
-                                    disabled={student.payment_status === 'paid'}
-                                    className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 disabled:opacity-50"
-                                >
-                                    Mark as Paid
-                                </button>
+                    {students.map(student => (
+                        <tr key={student.id}>
+                            <td>{student.name}</td>
+                            <td>{student.email}</td>
+                            <td>{student.phone}</td>
+                            <td>{student.course}</td>
+                            <td>{student.scorecard}</td>
+                            <td>
+                                {/* <button onClick={() => navigate(`/students/${student.id}/edit`)}>Edit</button> */}
+                                <button onClick={() => handleDelete(student.id)}>Delete</button>
+                                {/* <button onClick={() => handleUpdatePayment(student.id)}>Update Payment</button> */}
+                                {/* <button onClick={() => navigate(`/students/${student.id}/visa`)}>Manage Visa</button> */}
+                                <button onClick={() => navigate(`/students/${student.id}/scorecard`)}>Update Score</button>
                             </td>
                         </tr>
                     ))}
@@ -117,4 +72,3 @@ const StudentList = () => {
 };
 
 export default StudentList;
-

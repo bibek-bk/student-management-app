@@ -32,7 +32,7 @@ const App = () => {
             <Route path="/enrollments" element={<EnrollmentList />} />
             <Route path="/add-enrollment" element={<EnrollmentForm />} />
             <Route path="/students" element={<StudentList />} />
-            <Route path="/add-student" element={<StudentForm />} />
+            <Route path="/students/:id/scorecard" element={<StudentForm />} />
             <Route path="/students/:id" element={<StudentProfile />} />
           </Routes>
         </div>
