@@ -29,20 +29,29 @@ export const deleteEnrollment = async (id) => {
   if (!response.ok) {
     throw new Error('Failed to delete enrollment');
   }
-  return response.json();
 };
 
-export const updatePaymentStatus = async (id, statusData) => {
-  const response = await fetch(`${API_URL}/enrollments/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(statusData),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to update payment status');
-  }
-  return response.json();
+
+export const updatePaymentStatus = async (id, data) => {
+  return await fetch(`${API_URL}/enrollments/${id}`, {
+      method: 'PUT', // Ensure the method is PUT
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+  }).then(res => res.json());
 };
+
+
+// export const updatePaymentStatus = async (id, statusData) => {
+//   const response = await fetch(`${API_URL}/enrollments/${id}`, {
+//     method: 'PUT',
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//     body: JSON.stringify(statusData),
+//   });
+//   if (!response.ok) {
+//     throw new Error('Failed to update payment status');
+//   }
+//   return response.json();
+// };
 

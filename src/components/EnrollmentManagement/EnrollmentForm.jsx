@@ -8,7 +8,7 @@ import { addStudent } from '../../api/studentApi';
 
 
 
-const EnrollmentForm = () => {
+const EnrollmentForm = ({fetchData}) => {
     const [formData, setFormData] = useState({
         visitor_id: '', // Updated to visitor_id
         course_id: '',  // No change here
@@ -36,57 +36,54 @@ const EnrollmentForm = () => {
             .catch(setError)
             .finally(() => setLoading(false));
     }, []);
-    console.log(visitors);
+    // console.log(visitors);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
-        // e.preventDefault();
-        console.log('Form Data Being Sent:', formData); // Debugging log
-    
-        // Filter visitor details based on visitor_id
-        const selectedVisitor = visitors.find(visitor => visitor.id === Number(formData.visitor_id));
-        console.log('ehhlo',selectedVisitor);
-        
-        const selectedCourse = courses.find(course => course.id === Number(formData.course_id));
-        console.log('course',selectedCourse);
-        
-        // Check if the visitor exists
-        if (!selectedVisitor) {
-            console.error('No visitor found with the given ID');
-            setError('Visitor not found');
-            return;
-        }
-    
-        // Extract name, phone, and email from the selected visitor
-        const studentData = {
-            name: selectedVisitor.name,   // Name of the visitor
-            phone: selectedVisitor.phone, // Phone number
-            email: selectedVisitor.email,  // Email address
-            course: selectedCourse.name,
-        };
-        console.log(studentData,'studentData');
-        
-    
-        // Call APIs
-        addEnrollment(formData)
-            .then(() => {
-                console.log('Enrollment created successfully');
-                return addStudent(studentData); // Call addStudent after addEnrollment completes
-            })
-            .then(() => {
-                console.log('Student added successfully');
-                navigate('/'); // Navigate after both APIs succeed
-            })
-            .catch((err) => {
-                console.error('Error during submission:', err); // Debugging log
-                setError(err); // Set error state
-            });
+   // Inside EnrollmentForm component (keep the existing code)
+const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const selectedVisitor = visitors.find(visitor => visitor.id === Number(formData.visitor_id));
+    const selectedCourse = courses.find(course => course.id === Number(formData.course_id));
+
+    if (!selectedVisitor) {
+        setError('Visitor not found');
+        return;
+    }
+
+    const studentData = {
+        name: selectedVisitor.name,
+        phone: selectedVisitor.phone,
+        email: selectedVisitor.email,
+        course: selectedCourse.name,
     };
-    
+
+    addEnrollment(formData)
+        .then(() => {
+            console.log('Enrollment created successfully');
+            return addStudent(studentData);
+        })
+        .then(() => {
+            console.log('Student added successfully');
+            setFormData({
+                visitor_id: '',
+                course_id: '',
+                status: 'pending',
+                payment_status: 'pending',
+            });
+            fetchData(); // Trigger re-fetch to update the parent list
+        })
+        .catch((err) => {
+            console.error('Error during submission:', err);
+            setError(err);
+        });
+};
+
+
 
 
     if (loading) return <p className="text-center">Loading form data...</p>;

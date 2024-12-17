@@ -27,7 +27,7 @@ export const fetchStudents = () =>
   
   export const deleteStudent = (id) => 
     fetch(`${API_URL}/students/${id}`, { method: 'DELETE' })
-      .then(handleResponse);
+      // .then(handleResponse);
   
   export const fetchScoreCard = (id) => 
     fetch(`${API_URL}/students/${id}/scorecard`)

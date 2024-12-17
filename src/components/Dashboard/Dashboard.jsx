@@ -14,6 +14,9 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [visitors, setVisitors] = useState({});
+  const [courses, setCourses] = useState({});
+
 
   useEffect(() => {
     Promise.all([
@@ -22,7 +25,7 @@ const Dashboard = () => {
       fetchCourses(),
       fetchVisitors()
     ])
-      .then(([students, enrollments, courses,visitors]) => {
+      .then(([students, enrollments, courses, visitors]) => {
         setStats({
           totalStudents: students.length,
           totalEnrollments: enrollments.length,
@@ -30,6 +33,18 @@ const Dashboard = () => {
           totalVisitors: visitors.length,
           recentEnrollments: enrollments.slice(-5).reverse()
         });
+        const visitorMap = {};
+        visitors.forEach(visitor => {
+          visitorMap[visitor.id] = visitor.name;
+        });
+
+        const courseMap = {};
+        courses.forEach(course => {
+          courseMap[course.id] = course.name;
+        });
+
+        setVisitors(visitorMap);
+        setCourses(courseMap);
       })
       .catch(setError)
       .finally(() => setLoading(false));
@@ -64,8 +79,12 @@ const Dashboard = () => {
         <ul className="divide-y divide-gray-200">
           {stats.recentEnrollments.map((enrollment, index) => (
             <li key={index} className="py-2">
-              <p className="font-medium">{enrollment.studentName}</p>
-              <p className="text-sm text-gray-500">Enrolled in: {enrollment.courseName}</p>
+              <td className="p-2">
+                {visitors[enrollment.visitor_id] || "Unknown"}
+              </td>
+              <td className="p-2">
+                {courses[enrollment.course_id] || "Unknown"}
+              </td>
             </li>
           ))}
         </ul>

@@ -20,7 +20,7 @@ const StudentList = () => {
     const handleDelete = (id) => {
         deleteStudent(id)
             .then(() => setStudents(students.filter(student => student.id !== id)))
-            .catch(navigate('/'));
+            .catch(setError);
     };
 
     return (
@@ -28,7 +28,7 @@ const StudentList = () => {
             <h2 className="text-3xl font-semibold text-gray-900 mb-6">Student List</h2>
             {loading && <p className="text-lg text-gray-500">Loading...</p>}
             {error && <p className="text-lg text-red-600">Error: {error.message}</p>}
-            
+
             <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
                 <table className="min-w-full table-auto">
                     <thead className="bg-gray-100 text-left">
@@ -43,37 +43,46 @@ const StudentList = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {students.map(student => (
-                            <tr key={student.id} className="border-b hover:bg-gray-50">
-                                <td className="px-4 py-3 text-sm text-gray-800">{student.id}</td>
-                                <td className="px-4 py-3 text-sm text-gray-800">{student.name}</td>
-                                <td className="px-4 py-3 text-sm text-gray-800">{student.email}</td>
-                                <td className="px-4 py-3 text-sm text-gray-800">{student.phone}</td>
-                                <td className="px-4 py-3 text-sm text-gray-800">{student.course}</td>
-                                <td className="px-4 py-3 text-sm text-gray-800">
-                                    {student.scorecard ? (
-                                        <div>
-                                            <div>Reading: {student.scorecard.reading}</div>
-                                            <div>Listening: {student.scorecard.listening}</div>
-                                            <div>Writing: {student.scorecard.writing}</div>
-                                            <div>Speaking: {student.scorecard.speaking}</div>
-                                            <div>Overall: {student.scorecard.overall}</div>
-                                        </div>
-                                    ) : (
-                                        <span className="text-gray-500">No Scorecard</span>
-                                    )}
-                                </td>
-                                <td className="px-4 py-3 text-sm space-x-2">
-                                    <button 
-                                        className="text-red-600 hover:text-red-800 font-semibold"
-                                        onClick={() => handleDelete(student.id)}
-                                    >
-                                        Delete
-                                    </button>
+                        {students && students.length > 0 ? (
+                            students.map((student) => (
+                                <tr key={student.id} className="border-b hover:bg-gray-50">
+                                    <td className="px-4 py-3 text-sm text-gray-800">{student.id}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-800">{student.name}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-800">{student.email}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-800">{student.phone}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-800">{student.course}</td>
+                                    <td className="px-4 py-3 text-sm text-gray-800">
+                                        {student.scorecard ? (
+                                            <div>
+                                                <div>Reading: {student.scorecard.reading}</div>
+                                                <div>Listening: {student.scorecard.listening}</div>
+                                                <div>Writing: {student.scorecard.writing}</div>
+                                                <div>Speaking: {student.scorecard.speaking}</div>
+                                                <div>Overall: {student.scorecard.overall}</div>
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-500">No Scorecard</span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3 text-sm space-x-2">
+                                        <button
+                                            className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 mr-2"
+                                            onClick={() => handleDelete(student.id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="7" className="text-center p-4 text-gray-600">
+                                    No students found. Please add students.
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
+
                 </table>
             </div>
 

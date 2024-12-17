@@ -1,27 +1,23 @@
-
 import React, { useState, useEffect } from 'react';
 import { fetchEnrollments, deleteEnrollment, updatePaymentStatus } from '../../api/enrollmentApi';
 import EnrollmentForm from './EnrollmentForm';
-import { fetchVisitors } from '../../api/visitorApi'; // Updated to fetchVisitors
+import { fetchVisitors } from '../../api/visitorApi';
 import { fetchCourses } from '../../api/courseApi';
 
 const EnrollmentList = () => {
     const [enrollments, setEnrollments] = useState([]);
     const [error, setError] = useState(null);
-    const [visitors, setVisitors] = useState({}); // Updated to visitors
+    const [visitors, setVisitors] = useState({});
     const [courses, setCourses] = useState({});
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
+    // Function to fetch all data
+    const fetchData = () => {
         setLoading(true);
-
-        // Fetch enrollments, visitors, and courses in parallel
-        Promise.all([fetchEnrollments(), fetchVisitors(), fetchCourses()]) // Updated fetchStudents to fetchVisitors
+        console.log('hi');
+        Promise.all([fetchEnrollments(), fetchVisitors(), fetchCourses()])
             .then(([enrollmentsData, visitorsData, coursesData]) => {
-                // Map visitor and course data by their IDs
-                console.log(enrollmentsData);
-
-                const visitorMap = {}; // Updated from studentMap
+                const visitorMap = {};
                 visitorsData.forEach(visitor => {
                     visitorMap[visitor.id] = visitor.name;
                 });
@@ -31,14 +27,16 @@ const EnrollmentList = () => {
                     courseMap[course.id] = course.name;
                 });
 
-                setVisitors(visitorMap); // Updated setStudents to setVisitors
+                setVisitors(visitorMap);
                 setCourses(courseMap);
-                if (enrollmentsData) {
-                    setEnrollments(enrollmentsData);
-                }
+                setEnrollments(enrollmentsData);
             })
             .catch(setError)
             .finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        fetchData();
     }, []);
 
     const handleDelete = (id) => {
@@ -50,13 +48,14 @@ const EnrollmentList = () => {
     };
 
     const handleUpdatePayment = (id, status) => {
-        updatePaymentStatus(id, { paymentStatus: status })
+        updatePaymentStatus(id, { payment_status: status })
             .then(() => {
                 setEnrollments(enrollments.map(enrollment => (
                     enrollment.id === id ? { ...enrollment, payment_status: status } : enrollment
                 )));
+                console.log('payment update');
+
             })
-            .then('updateSuccessfull')
             .catch(setError);
     };
 
@@ -69,40 +68,54 @@ const EnrollmentList = () => {
             <table className="w-full mb-10">
                 <thead className="bg-gray-200">
                     <tr>
-                        <th className="p-2 text-left">ID</th> {/* Updated from Student Name */}
-                        <th className="p-2 text-left"> Student Name</th> {/* Updated from Student Name */}
+                        <th className="p-2 text-left">ID</th>
+                        <th className="p-2 text-left">Student Name</th>
                         <th className="p-2 text-left">Course</th>
                         <th className="p-2 text-left">Payment Status</th>
                         <th className="p-2 text-left">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {enrollments.map(enrollment => (
-                        <tr key={enrollment.id} className="border-t">
-                            <td className="p-2">{enrollment.id || 'Unknown'}</td> {/* Updated student_id to visitor_id */}
-                            <td className="p-2">{visitors[enrollment.visitor_id] || 'Unknown'}</td> {/* Updated student_id to visitor_id */}
-                            <td className="p-2">{courses[enrollment.course_id] || 'Unknown'}</td>
-                            <td className="p-2">{enrollment.payment_status}</td>
-                            <td className="p-2">
-                                <button
-                                    onClick={() => handleDelete(enrollment.id)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 mr-2"
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    onClick={() => handleUpdatePayment(enrollment.id, 'paid')}
-                                    disabled={enrollment.paymentStatus === 'paid'}
-                                    className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 disabled:opacity-50"
-                                >
-                                    Mark as Paid
-                                </button>
+                    {enrollments && enrollments.length > 0 ? (
+                        enrollments.map((enrollment) => (
+                            <tr key={enrollment.id} className="border-t">
+                                <td className="p-2">{enrollment.id || "Unknown"}</td>
+                                <td className="p-2">
+                                    {visitors[enrollment.visitor_id] || "Unknown"}
+                                </td>
+                                <td className="p-2">
+                                    {courses[enrollment.course_id] || "Unknown"}
+                                </td>
+                                <td className="p-2">{enrollment.payment_status}</td>
+                                <td className="p-2">
+                                    <button
+                                        onClick={() => handleDelete(enrollment.id)}
+                                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 mr-2"
+                                    >
+                                        Delete
+                                    </button>
+                                    <button
+                                        onClick={() => handleUpdatePayment(enrollment.id, "paid")}
+                                        disabled={enrollment.payment_status === "paid"}
+                                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 disabled:opacity-50"
+                                    >
+                                        Mark as Paid
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="5" className="text-center p-4 text-gray-600">
+                                No enrollments found. Please add enrollments.
                             </td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
+
             </table>
-            <EnrollmentForm />
+            {/* Pass fetchData to EnrollmentForm */}
+            <EnrollmentForm fetchData={fetchData} />
         </div>
     );
 };
